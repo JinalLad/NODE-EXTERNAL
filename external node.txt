@@ -1,0 +1,124 @@
+//API NODE
+
+var express = require('express')
+var app = express()
+var mongoose = require('mongoose')
+
+mongoose.connect("mongodb://localhost:27017/Book",{useNewUrlParser:true})
+
+var db = mongoose.connection;
+db.on('error',(e)=>{
+    console.log(e)
+});
+
+var BookSchema = mongoose.schema({
+    name:String,
+    price:Number,
+    quantity:Number
+});
+
+var Book = mongoose.model('Book',BookSchema,"books");
+app.get("/",function(req,res){
+    var book1 = new Book({name:'mongoose',price:1000,quantity:25})
+    book1.save(function(err,book){
+        if(err)return console.error(err)
+        //id=book._id;
+       // console.log(book._id + "Saved to Book Collection.");
+        res.send(book.name +"Saved to Book Collection.")
+    });
+})
+
+app.get("/getall",function(req,res){
+    Book.find(function(err,books){
+        if(err)return console.error(err)
+        console.log(books)
+        res.send(books)
+    })
+});
+
+app.listen(8080)
+
+//PHP
+<?php
+//CONNECTION
+$con = mysqli_connect("localhost","root","root","book");
+
+if(isset($_POST['btnadd']))
+{
+    $name = $_POST['name'];
+    $query = mysqli_query($con,"insert into book values('','$name')"); //INSERT RECORD
+    if($query)
+    {
+        echo "<script>alert(record inserted)</script>";
+    }
+}
+?>
+
+//FORM DESIGN
+<form method = post>
+ NAME :<input type = "text" , name = "name">
+ <button type = "submit" name = "btnadd"> ADD </button>
+</form>
+
+//DISPLAY RECORD 
+<?php
+$query = mysqli_query($con,"select * from book");
+echo "<table border=2>";
+echo "<th>id";
+echo "<th>name";
+
+while($row = mysqli_fetch_array($query))
+{
+    echo "<tr>";
+    echo "<td>".$row['id'];
+    echo "<td>".$row['name'];
+}
+echo "</table>";
+?>
+
+
+//UPDATE
+<?php
+//CONNECTION
+$con = mysqli_connect("localhost","root","root","book");
+$ID=$_GET['x'];
+$query=mysqli_query($con,"select * from book where id=$ID");
+$row=mysqli_fetch_array($query);
+if(isset($_POST['btnup']))
+{
+    $id=$_POST['id'];
+    $name=$_POST['name'];
+    $query=mysqli_query($con,"update book set id=$ID ,name='$name'where id=$ID");
+if($query)
+    {
+        echo "<script>alert(record updated)</script>";
+    }
+}
+?>
+
+//FORM DESIGN
+<form method = POST>
+ID :<input type = "number" , name = "id">
+ NAME :<input type = "text" , name = "name">
+ <button type = "submit" name = "btnupdate"> UPDATE </button>
+</form>
+
+//DELETE
+<?php
+$ID=$_GET['x'];
+
+		$con=mysqli_connect("localhost","root","root","book");
+		
+
+			$query=mysqli_query($con,"delete from book where id=$ID");
+
+		if($query)
+		{
+	
+			echo "<script>alert('delete record'); </script>";
+		}
+		else
+		{
+			echo "Not ";
+		}
+?>
